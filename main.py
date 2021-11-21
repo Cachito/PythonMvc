@@ -1,11 +1,28 @@
-from tkinter import *
-from vista import Ventanita
-from controlador import *
+import tkinter as tk
+from model import *
+from view import *
+from controller import *
 
-print("Desde Main:  ", __name__)
+class App(tk.Tk):
+    def __init__(self):
+        super().__init__()
 
-if __name__ == "__main__":
-    print("Esto se ejecuta si estamos en main.py ")
-    root = Tk()
-    objeto = Controller(root)
-    root.mainloop()
+        self.title('Tkinter MVC Demo')
+
+        # create a model
+        model = Model('hello@pythontutorial.net')
+
+        # create a view and place it on the root window
+        view = View(self)
+        view.grid(row=0, column=0, padx=10, pady=10)
+
+        # create a controller
+        controller = Controller(model, view)
+
+        # set the controller to view
+        view.set_controller(controller)
+
+
+if __name__ == '__main__':
+    app = App()
+    app.mainloop()
