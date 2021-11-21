@@ -1,27 +1,112 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+import tkinter.messagebox as msg
 
 class View(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        # create widgets
-        # label
-        self.label = ttk.Label(self, text='Email:')
-        self.label.grid(row=1, column=0)
+        # Defino variables por defecto
+        self.id = tk.StringVar()
+        self.fecha = tk.StringVar()
+        self.medio = tk.StringVar()
+        self.seccion = tk.StringVar()
+        self.titulo = tk.StringVar()
+        self.cuerpo = tk.StringVar()
+        #self.archivo = tk.StringVar()
+        self.busqueda = tk.StringVar()
 
-        # email entry
-        self.email_var = tk.StringVar()
-        self.email_entry = ttk.Entry(self, textvariable=self.email_var, width=30)
-        self.email_entry.grid(row=1, column=1, sticky=tk.NSEW)
+        self.my_parent = parent
+        self.my_parent.geometry("500x600")
+        self.my_parent.title("Carga de Noticias")
+        self.my_parent.iconbitmap("./imagenes/noticias.ico")
 
-        # save button
-        self.save_button = ttk.Button(self, text='Save', command=self.save_button_clicked)
-        self.save_button.grid(row=1, column=3, padx=10)
+        self.frm_contenedor = ttk.Frame(self.my_parent, height=600, borderwidth=1)
 
-        # message
-        self.message_label = ttk.Label(self, text='', foreground='red')
-        self.message_label.grid(row=2, column=1, sticky=tk.W)
+        # controles: guardar
+        self.frm_controles = ttk.Frame(master=self.frm_contenedor, height=40, borderwidth=1, relief=tk.RAISED)
+
+        self.img_db = tk.PhotoImage(file = r"./imagenes/iconDb.png")
+        self.btn_db = tk.Button(master=self.frm_controles, text="Base de Detos", image=self.img_db, width=30, command=self.create_data)
+        self.btn_db.place(x=15, y=2)
+
+        self.img_table = tk.PhotoImage(file=r"./imagenes/iconTable.png")
+        self.btn_table = tk.Button(master=self.frm_controles, text="Tabla", image=self.img_table, width=30, command=self.create_table)
+        self.btn_table.place(x=50, y=2)
+
+        self.img_nuevo = tk.PhotoImage(file=r"./imagenes/iconNew.png")
+        self.btn_nuevo = tk.Button(master=self.frm_controles, text="Nuevo", image=self.img_nuevo, width=30, command=self.clear_data)
+        self.btn_nuevo.place(x=85, y=2)
+
+        self.img_guardar = tk.PhotoImage(file=r"./imagenes/iconSave.png")
+        self.btn_guardar = tk.Button(master=self.frm_controles, text="Guardar", image=self.img_guardar, width=30, command=self.save_data)
+        self.btn_guardar.place(x=120, y=2)
+
+        self.img_borrar = tk.PhotoImage(file = r"./imagenes/iconDelete.png")
+        self.btn_borrar = tk.Button(master=self.frm_controles, text="Eliminar", image=self.img_borrar, width=30, command=self.delete_data)
+        self.btn_borrar.place(x=155, y=2)
+
+        self.img_refresh = tk.PhotoImage(file=r"./imagenes/iconRefresh.png")
+        self.btn_refresh = ttk.Button(master=self.frm_controles, text="Actualizar", image=self.img_refresh, width=30, command=self.refresh)
+        self.btn_refresh.place(x=190, y=2)
+
+        self.ent_busqueda = tk.Entry(master=self.frm_controles, textvariable=self.busqueda, width=3)
+        self.ent_busqueda.place(x=235, y=7)
+
+        self.img_buscar = tk.PhotoImage(file=r"./imagenes/iconSearch.png")
+        self.btn_buscar = tk.Button(master=self.frm_controles, text="Buscar", image=self.img_buscar, width=30, command=self.buscar)
+        self.btn_buscar.place(x=260, y=2)
+
+        self.frm_controles.pack(side=tk.TOP, expand=tk.NO, fill=tk.X) #place(x=5,y=400)
+
+        self.frm_datos = tk.Frame(master=self.frm_contenedor, height=300, borderwidth=1, relief=tk.SOLID)
+
+        self.lbl_fecha=tk.Label(master=self.frm_datos, text="Fecha", width=50, anchor=tk.W)
+        self.lbl_fecha.place(x=5, y=5)
+        self.ent_fecha=tk.Entry(master=self.frm_datos, textvariable=self.fecha, width=50)
+        self.ent_fecha.place(x=60, y=5)
+
+        self.lbl_medio=tk.Label(master=self.frm_datos, text="Medio", width=50, anchor=tk.W)
+        self.lbl_medio.place(x=5, y=35)
+        self.ent_medio=tk.Entry(master=self.frm_datos, textvariable=self.medio, width=50)
+        self.ent_medio.place(x=60, y=35)
+
+        self.lbl_seccion=tk.Label(master=self.frm_datos, text="Sección", width=50, anchor=tk.W)
+        self.lbl_seccion.place(x=5, y=65)
+        self.ent_seccion=tk.Entry(master=self.frm_datos, textvariable=self.seccion, width=50)
+        self.ent_seccion.place(x=60, y=65)
+
+        self.lbl_titulo=tk.Label(master=self.frm_datos, text="Título", width=50, anchor=tk.W)
+        self.lbl_titulo.place(x=5, y=95)
+        self.ent_titulo=tk.Entry(master=self.frm_datos, textvariable=self.titulo, width=50)
+        self.ent_titulo.place(x=60, y=95)
+
+        self.lbl_cuerpo=tk.Label(master=self.frm_datos, text="Cuerpo", width=50, anchor=tk.W)
+        self.lbl_cuerpo.place(x=5, y=125)
+        self.ent_cuerpo=tk.Text(master=self.frm_datos, width=50, height=10)
+        self.ent_cuerpo.place(x=60, y=125)
+
+        self.frm_datos.pack(side=tk.TOP, expand=tk.NO, fill=tk.X) #place(x=5,y=400)
+
+        self.frm_grilla = ttk.Frame(master=self.frm_contenedor, height=100, borderwidth=1, relief=tk.RAISED)
+        self.tree = ttk.Treeview(master=self.frm_grilla)
+        self.tree["columns"] = ("Fecha", "Medio", "Seccion", "Titulo")
+        self.tree.column("#0", width=50, minwidth=50, anchor=tk.W)
+        self.tree.column("Fecha", width=80, minwidth=80)
+        self.tree.column("Medio", width=80, minwidth=80)
+        self.tree.column("Seccion", width=80, minwidth=80)
+        self.tree.column("Titulo", width=100, minwidth=100)
+        self.tree.heading('#0', text='', anchor=tk.CENTER)
+        self.tree.heading('Fecha', text='Fecha', anchor=tk.CENTER)
+        self.tree.heading('Medio', text='Medio', anchor=tk.CENTER)
+        self.tree.heading('Seccion', text='Sección', anchor=tk.CENTER)
+        self.tree.heading('Titulo', text='Título', anchor=tk.CENTER)
+        self.tree.place(x=5, y=5)
+        #self.tree.bind("<Double-1>", self.on_double_click)
+
+        self.frm_grilla.pack(side=tk.TOP, expand=tk.YES, fill=tk.BOTH) #place(x=5,y=400)
+
+        self.frm_contenedor.pack(expand=tk.YES, fill=tk.BOTH)
 
         # set the controller
         self.controller = None
@@ -34,42 +119,97 @@ class View(ttk.Frame):
         """
         self.controller = controller
 
-    def save_button_clicked(self):
+    def clean_tree(self):
         """
-        Handle button click event
+        # limpieza de tabla
+        :return:
+        """
+        records = self.tree.get_children()
+        for element in records:
+            self.tree.delete(element)
+
+    def load_tree(self, resultado):
+        """
+        # carga de registros de tabla
+        :param resultado
+        :return:
+        """
+        for fila in resultado:
+            self.tree.insert('', 0, text=fila[0], values=(fila[1], fila[2], fila[3], fila[4]))
+
+    def refresh(self):
+        """
+        botón refresh evento click
         :return:
         """
         if self.controller:
-            self.controller.save(self.email_var.get())
+            self.controller.refresh()
 
-    def show_error(self, message):
+    def create_data(self):
         """
-        Show an error message
-        :param message:
+        botón crear base evento click
         :return:
         """
-        self.message_label['text'] = message
-        self.message_label['foreground'] = 'red'
-        self.message_label.after(3000, self.hide_message)
-        self.email_entry['foreground'] = 'red'
+        if self.controller:
+            self.controller.create_data()
 
-    def show_success(self, message):
+    def create_table(self):
         """
-        Show a success message
-        :param message:
+        botón crear tabla evento click
         :return:
         """
-        self.message_label['text'] = message
-        self.message_label['foreground'] = 'green'
-        self.message_label.after(3000, self.hide_message)
+        if self.controller:
+            self.controller.create_table()
 
-        # reset the form
-        self.email_entry['foreground'] = 'black'
-        self.email_var.set('')
-
-    def hide_message(self):
+    def clear_data(self):
         """
-        Hide the message
+        limpia los controles en la vista
         :return:
         """
-        self.message_label['text'] = ''
+        self.id = "0"
+        self.fecha = ""
+        self.medio = ""
+        self.seccion = ""
+        self.titulo = ""
+        self.cuerpo = ""
+        #self.archivo = ""
+        self.cuerpo = ""
+        self.busqueda = ""
+
+        self.ent_fecha.delete(0, tk.END)
+        self.ent_medio.delete(0, tk.END)
+        self.ent_seccion.delete(0, tk.END)
+        self.ent_titulo.delete(0, tk.END)
+        #self.ent_archivo.delete(0, tk.END)
+        self.ent_cuerpo.delete("1.0", tk.END)
+        self.ent_fecha.delete(0, tk.END)
+        self.ent_busqueda.delete(0, tk.END)
+
+    def save_data(self):
+        """
+        guarda un registro
+        :return:
+        """
+        if self.controller:
+            self.controller.save_data()
+
+    def delete_data(self):
+        """
+        elimina un registro
+        :return:
+        """
+        self.salta_violeta("titulo", "delete")
+
+    def buscar(self):
+        """
+        busca según id
+        :return:
+        """
+        self.salta_violeta("titulo", "buscar")
+
+    def salta_violeta(self, titulo, texto):
+        """
+        muestra un diálogo
+        :return:
+        """
+        msg.showinfo(titulo, texto)
