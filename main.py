@@ -1,11 +1,25 @@
-from tkinter import *
-from vista import Ventanita
-from controlador import *
+import tkinter as tk
+from model import *
+from view import *
+from controller import *
 
-print("Desde Main:  ", __name__)
+class App(tk.Tk):
+    def __init__(self):
+        super().__init__()
 
-if __name__ == "__main__":
-    print("Esto se ejecuta si estamos en main.py ")
-    root = Tk()
-    objeto = Controller(root)
-    root.mainloop()
+        # create a model
+        model = Model()
+
+        # create a view and place it on the root window
+        view = View(self)
+
+        # create a controller
+        controller = Controller(model, view)
+
+        # set the controller to view
+        view.set_controller(controller)
+
+
+if __name__ == '__main__':
+    app = App()
+    app.mainloop()
