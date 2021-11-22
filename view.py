@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as msg
+from clases import *
 
 class View(ttk.Frame):
     def __init__(self, parent):
@@ -102,18 +103,30 @@ class View(ttk.Frame):
         self.tree.heading('Seccion', text='Sección', anchor=tk.CENTER)
         self.tree.heading('Titulo', text='Título', anchor=tk.CENTER)
         self.tree.place(x=5, y=5)
-        #self.tree.bind("<Double-1>", self.on_double_click)
+        self.tree.bind("<Double-1>", self.on_double_click)
 
         self.frm_grilla.pack(side=tk.TOP, expand=tk.YES, fill=tk.BOTH) #place(x=5,y=400)
 
         self.frm_contenedor.pack(expand=tk.YES, fill=tk.BOTH)
 
-        # set the controller
+        self.menu_bar = tk.Menu(parent)
+        self.menu_archivo = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_archivo.add_separator()
+        self.menu_archivo.add_command(label="Acerca de..", command=self.about)
+        self.menu_archivo.add_command(label="Salir", command=self.quit)
+        self.menu_bar.add_cascade(label="Archivo", menu=self.menu_archivo)
+
+        parent.config(menu=self.menu_bar)
+
+        # set controller
         self.controller = None
+
+    def about(self):
+        self.salta_violeta("Entrega Final", "Cargador de Noticias\n\nGrupo:\n- Luis Carro\n- Cristian Maier")
 
     def set_controller(self, controller):
         """
-        Set the controller
+        Set controller
         :param controller:
         :return:
         """
@@ -136,6 +149,27 @@ class View(ttk.Frame):
         """
         for fila in resultado:
             self.tree.insert('', 0, text=fila[0], values=(fila[1], fila[2], fila[3], fila[4]))
+
+    def on_double_click(self, event):
+        if self.controller:
+            cur_item = self.tree.item(self.tree.focus())
+            noti = self.controller.get_datos(cur_item["text"])
+            self.clear_data()
+
+            if noti is None:
+                self.salta_violeta("Carro-Maier", f"registro com id {cur_item} no encontrado")
+            else:
+                self.id = noti[0]
+                self.fecha = noti[1]
+                self.medio = noti[2]
+                self.seccion = noti[3]
+                self.titulo = noti[4]
+
+                self.ent_fecha.insert(0, noti[1])
+                self.ent_medio.insert(0, noti[2])
+                self.ent_seccion.insert(0, noti[3])
+                self.ent_titulo.insert(0, noti[4])
+                self.ent_cuerpo.insert("1.0", noti[5])
 
     def refresh(self):
         """
@@ -191,21 +225,40 @@ class View(ttk.Frame):
         :return:
         """
         if self.controller:
-            self.controller.save_data()
+            noti = Noticia(self.id, self.ent_fecha.get(), self.ent_medio.get(), self.ent_seccion.get(), self.ent_titulo.get(), self.ent_cuerpo.get("1.0", tk.END))
+            self.controller.save_data(noti)
 
     def delete_data(self):
         """
         elimina un registro
         :return:
         """
-        self.salta_violeta("titulo", "delete")
+        if self.controller:
+            self.controller.delete_data(self.id)
 
     def buscar(self):
         """
         busca según id
         :return:
         """
-        self.salta_violeta("titulo", "buscar")
+        if self.controller:
+            noti = self.controller.get_datos(self.ent_busqueda.get())
+            self.clear_data()
+
+            if noti is None:
+                self.salta_violeta("Carro-Maier", f"registro com id {self.ent_busqueda.get()} no encontrado")
+            else:
+                self.id = noti[0]
+                self.fecha = noti[1]
+                self.medio = noti[2]
+                self.seccion = noti[3]
+                self.titulo = noti[4]
+
+                self.ent_fecha.insert(0, noti[1])
+                self.ent_medio.insert(0, noti[2])
+                self.ent_seccion.insert(0, noti[3])
+                self.ent_titulo.insert(0, noti[4])
+                self.ent_cuerpo.insert("1.0", noti[5])
 
     def salta_violeta(self, titulo, texto):
         """
