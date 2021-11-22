@@ -1,11 +1,20 @@
+"""
+Módulo model.py
+"""
 import re
 import mysql.connector
-import sys
-import re
-import datetime
-from clases import *
+
 class Model:
+    """
+    Clase Model
+    Obtiene y guarda en base de datos.
+    """
     def get_all(self):
+        """
+        devuelve todos los registros
+        de la tabla noticias
+        ordenados por fecha
+        """
         db_cacho = mysql.connector.connect(
             host="localhost",
             user="root",
@@ -34,6 +43,10 @@ class Model:
         return resultado
 
     def create_data(self):
+        """
+        crea la base de datos carro_maier
+        si existe, la elimina
+        """
         try:
             db_cacho = mysql.connector.connect(
                 host="localhost",
@@ -61,6 +74,10 @@ class Model:
             raise Exception(f'error al abrir conexion: {str(e)}')
 
     def create_table(self):
+        """
+        crea la tabla noticias
+        si existe, la elimina
+        """
         try:
             db_cacho = mysql.connector.connect(
                 host="localhost",
@@ -96,6 +113,9 @@ class Model:
             raise Exception(f"error al abrir base de datos carro_maier: {str(e)}")
 
     def save_data(self, noticia):
+        """
+        guarda una noticia
+        """
         try:
             db_cacho = mysql.connector.connect(
                 host="localhost",
@@ -107,28 +127,28 @@ class Model:
             try:
                 csr_cacho = db_cacho.cursor()
 
-                medio = re.sub("[\"']", r"", noticia.Medio)
-                seccion = re.sub("[\"']", r"", noticia.Seccion)
-                titulo = re.sub("[\"']", r"", noticia.Titulo)
-                cuerpo = re.sub("[\"']", r"", noticia.Cuerpo)
+                medio = re.sub("[\"']", r"", noticia.medio)
+                seccion = re.sub("[\"']", r"", noticia.seccion)
+                titulo = re.sub("[\"']", r"", noticia.titulo)
+                cuerpo = re.sub("[\"']", r"", noticia.cuerpo)
 
-                if noticia.Id == "0":
+                if noticia.id == "0":
                     sql_insert = """
                         INSERT INTO Noticias (Fecha, Medio, Seccion, Titulo, Cuerpo)
                             VALUES (%s, %s, %s, %s, %s)
                         """
-                    datos = (noticia.Fecha, medio, seccion, titulo, cuerpo)
+                    datos = (noticia.fecha, medio, seccion, titulo, cuerpo)
 
                     csr_cacho.execute(sql_insert, datos)
                 else:
                     sql_update = f"""
                         UPDATE Noticias SET
-                            Fecha = '{noticia.Fecha}',
+                            Fecha = '{noticia.fecha}',
                             Medio = '{medio}',
                             Seccion = '{seccion}',
                             Titulo = '{titulo}',
                             Cuerpo = '{cuerpo}'
-                        WHERE Id = {noticia.Id}
+                        WHERE Id = {noticia.id}
                         """
                     csr_cacho.execute(sql_update)
 
@@ -138,12 +158,16 @@ class Model:
             except Exception as e:
                 db_cacho.rollback()
                 db_cacho.close()
-                raise Exception(f"error al {'insertar' if noticia.Id == '0' else 'actualizar'} registro en tabla Noticias: {str(e)}")
+                raise Exception(f"error al {'insertar' if noticia.id == '0' else 'actualizar'} registro en tabla Noticias: {str(e)}")
 
         except Exception as e:
             raise Exception(f"error al abrir base de datos carro_maier: {str(e)}")
 
     def get_datos(self, search_id):
+        """
+        devuelve un registro según search_id
+        si lo encuentra
+        """
         try:
             db_cacho = mysql.connector.connect(
                 host="localhost",
@@ -180,6 +204,10 @@ class Model:
             raise Exception(f"error al abrir base de datos carro_maier: {str(e)}")
 
     def delete_data(self, search_id):
+        """
+        elimina un registro según search_id
+        si lo encuentra
+        """
         try:
             db_cacho = mysql.connector.connect(
                 host="localhost",
@@ -198,7 +226,7 @@ class Model:
                 db_cacho.commit()
                 db_cacho.close()
 
-            except:
+            except Exception as e:
                 db_cacho.rollback()
                 db_cacho.close()
                 raise Exception(f"error al eliminar registro en tabla Noticias: {str(e)}")

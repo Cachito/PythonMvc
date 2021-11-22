@@ -1,9 +1,17 @@
+"""
+Módulo principal
+"""
 import tkinter as tk
-from model import *
-from view import *
-from controller import *
+from view import View
+from model import Model
+from controller import Controller
 
 class App(tk.Tk):
+    """
+    clase App
+    por lo que entiendo hereda Tk
+    inspirado en https://www.pythontutorial.net/tkinter/tkinter-mvc/
+    """
     def __init__(self):
         super().__init__()
 
