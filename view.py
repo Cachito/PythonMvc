@@ -1,9 +1,17 @@
+"""
+Módulo view.py
+"""
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as msg
-from clases import *
+from clases import Noticia
 
 class View(ttk.Frame):
+    """
+    Clase View
+    Interfaz de usuario.
+    Interactúa con Controller.
+    """
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -118,24 +126,23 @@ class View(ttk.Frame):
 
         parent.config(menu=self.menu_bar)
 
-        # set controller
         self.controller = None
 
     def about(self):
-        self.salta_violeta("Entrega Final", "Cargador de Noticias\n\nGrupo:\n- Luis Carro\n- Cristian Maier")
+        """
+        dialogo about
+        """
+        self.salta_violeta("Patrón MVC", "Cargador de Noticias\n\nGrupo:\n- Luis Carro\n- Cristian Maier")
 
     def set_controller(self, controller):
         """
-        Set controller
-        :param controller:
-        :return:
+        Establece la referencia al controller
         """
         self.controller = controller
 
     def clean_tree(self):
         """
-        # limpieza de tabla
-        :return:
+        vacía el treeview
         """
         records = self.tree.get_children()
         for element in records:
@@ -143,14 +150,15 @@ class View(ttk.Frame):
 
     def load_tree(self, resultado):
         """
-        # carga de registros de tabla
-        :param resultado
-        :return:
+        carga el treeview
         """
         for fila in resultado:
             self.tree.insert('', 0, text=fila[0], values=(fila[1], fila[2], fila[3], fila[4]))
 
     def on_double_click(self, event):
+        """
+        evento doble click en treeview
+        """
         if self.controller:
             cur_item = self.tree.item(self.tree.focus())
             noti = self.controller.get_datos(cur_item["text"])
@@ -174,7 +182,6 @@ class View(ttk.Frame):
     def refresh(self):
         """
         botón refresh evento click
-        :return:
         """
         if self.controller:
             self.controller.refresh()
@@ -182,7 +189,6 @@ class View(ttk.Frame):
     def create_data(self):
         """
         botón crear base evento click
-        :return:
         """
         if self.controller:
             self.controller.create_data()
@@ -190,7 +196,6 @@ class View(ttk.Frame):
     def create_table(self):
         """
         botón crear tabla evento click
-        :return:
         """
         if self.controller:
             self.controller.create_table()
@@ -198,7 +203,6 @@ class View(ttk.Frame):
     def clear_data(self):
         """
         limpia los controles en la vista
-        :return:
         """
         self.id = "0"
         self.fecha = ""
@@ -222,7 +226,6 @@ class View(ttk.Frame):
     def save_data(self):
         """
         guarda un registro
-        :return:
         """
         if self.controller:
             noti = Noticia(self.id, self.ent_fecha.get(), self.ent_medio.get(), self.ent_seccion.get(), self.ent_titulo.get(), self.ent_cuerpo.get("1.0", tk.END))
@@ -231,7 +234,6 @@ class View(ttk.Frame):
     def delete_data(self):
         """
         elimina un registro
-        :return:
         """
         if self.controller:
             self.controller.delete_data(self.id)
@@ -239,14 +241,14 @@ class View(ttk.Frame):
     def buscar(self):
         """
         busca según id
-        :return:
         """
         if self.controller:
-            noti = self.controller.get_datos(self.ent_busqueda.get())
+            search_id = self.ent_busqueda.get()
+            noti = self.controller.get_datos(search_id)
             self.clear_data()
 
             if noti is None:
-                self.salta_violeta("Carro-Maier", f"registro com id {self.ent_busqueda.get()} no encontrado")
+                self.salta_violeta("Carro-Maier", f"registro com id {search_id} no encontrado")
             else:
                 self.id = noti[0]
                 self.fecha = noti[1]
@@ -263,6 +265,5 @@ class View(ttk.Frame):
     def salta_violeta(self, titulo, texto):
         """
         muestra un diálogo
-        :return:
         """
         msg.showinfo(titulo, texto)
